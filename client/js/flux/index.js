@@ -59,22 +59,12 @@ const reducer = async (prevState, { type, payload }) => {
         return { ...prevState, error: err };
       }
     }
-    case UPDATE_TODO_ACTION_TYPE: {
-      const { id, ...body } = payload;
+    case ADD_TODO_ACTION_TYPE: {
+      const body = JSON.stringify(payload);
+      const config = { method: "POST", body, headers };
       try {
-        const resp = await fetch(`${api}/${id}`, {
-          method: "PATCH",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json; charset=utf-8",
-          },
-          body: JSON.stringify(body),
-        }).then((d) => d.json());
-        const idx = prevState.todoList.findIndex((todo) => todo.id === resp.id);
-        if (idx === -1) return prevState;
-        const nextTodoList = prevState.todoList.concat();
-        nextTodoList[idx] = resp;
-        return { todoList: nextTodoList, error: null };
+        const resp = await fetch(api, config).then((d) => d.json());
+        return { todoList: [...prevState.todoList, resp], error: null };
       } catch (err) {
         return { ...prevState, error: err };
       }
